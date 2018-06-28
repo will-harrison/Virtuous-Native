@@ -5,18 +5,21 @@ import styled from 'styled-components'
 import { Column, colors } from '../../theme/'
 
 const data = [
-  { quarter: 1, earnings: 13000 },
-  { quarter: 2, earnings: 16500 },
-  { quarter: 3, earnings: 14250 },
-  { quarter: 4, earnings: 19000 },
-  { quarter: 5, earnings: 13000 },
-  { quarter: 6, earnings: 16500 },
-  { quarter: 7, earnings: 14250 },
-  { quarter: 8, earnings: 19000 },
-  { quarter: 9, earnings: 13000 },
-  { quarter: 10, earnings: 16500 },
-  { quarter: 11, earnings: 14250 },
-  { quarter: 12, earnings: 19000 },
+  { quarter: 1, earnings: 0 },
+  { quarter: 1, earnings: -1 },
+  { quarter: 1, earnings: 0 },
+  { quarter: 1, earnings: 1 },
+  { quarter: 2, earnings: 2 },
+  { quarter: 3, earnings: 1 },
+  { quarter: 4, earnings: 2 },
+  { quarter: 5, earnings: 1 },
+  { quarter: 6, earnings: 0 },
+  { quarter: 7, earnings: 1 },
+  { quarter: 8, earnings: 2 },
+  { quarter: 9, earnings: 3 },
+  { quarter: 10, earnings: 2 },
+  { quarter: 11, earnings: 3 },
+  { quarter: 12, earnings: 4 },
 ];
 
 export default class App extends React.Component {
@@ -25,7 +28,6 @@ export default class App extends React.Component {
       <ChartContainer>
         <VictoryLine
           data={data}
-          x="quarter"
           y="earnings"
           style={{
             data: { stroke: `${colors().white}` }

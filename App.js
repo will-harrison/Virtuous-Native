@@ -1,56 +1,48 @@
 import React from 'react'
-import styled from 'styled-components'
-import { Text, View } from 'react-native'
-import { colors, Column, Theme, Txt } from './theme/'
-import Login from './components/login/Login'
-import Virtue from './components/virtues/Virtue'
+import { createStackNavigator } from "react-navigation"
+import { colors } from './theme'
+import LoginContext from './components/login/Login'
+import Home from './components/home/Home'
 import NewVirtue from './components/virtues/NewVirtue'
-import { getVirtues } from './api/api'
+import Virtue from './components/virtues/Virtue'
 
-export default class App extends React.Component {
-  state = {
-    authorized: false,
-    userName: '',
-    testing: true
-  }
+import UserProvider from './api/userContext';
 
-  async componentDidMount() {
-    if (this.state.testing) {
-      await this.setState(state => {
-        return {
-          authorized: true,
-          userName: 'will'
-        }
-      })
+
+const AppStackNavigator = createStackNavigator({
+  Login: {
+    screen: LoginContext,
+    navigationOptions: {
+      header: null
     }
-    const virtues = await getVirtues(this.state.userName)
-    console.log('virtues', virtues)
-  }
-
-  onLogin = (args) => {
-    this.setState(state => {
-      return {
-        ...state,
-        authorized: true,
-        userName: args.userName
+  },
+  Home: {
+    screen: Home,
+    navigationOptions: {
+      header: null
+    }
+  },
+  NewVirtue: {
+    screen: NewVirtue,
+    navigationOptions: {
+      title: 'tester',
+      headerStyle: {
+        backgroundColor: `${colors(.75).blue}`
       }
-    })
+    }
+  },
+  Virtue: {
+    screen: Virtue,
+    navigationOptions: {
+      headerStyle: {
+        backgroundColor: `${colors(.75).blue}`,
+      }
+    }
   }
+})
 
-  render() {
-    return (
-      <Theme>
-        {this.state.authorized
-          ? <Virtue virtue={{ title: 'Temperance', description: 'Eat not to dullness; drink not to elevation.' }} />
-          : <Login onLogin={this.onLogin} />
-        }
-      </Theme>
-    )
-  }
-}
-
-const Hello = styled(Txt)`
-  margin-top: 150px;
-  font-size: 36px;
-  color: ${colors().white};
-`
+export default App = () => (
+  <UserProvider>
+    <AppStackNavigator />
+  </UserProvider>
+)

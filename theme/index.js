@@ -48,7 +48,7 @@ export const Input = styled.TextInput`
 export const ButtonText = styled(Txt)`
   font-size: 16;
   padding-horizontal: 15;
-  padding-vertical: 5;
+  padding-vertical: 30;
   width: ${Dimensions.get('window').width * 0.35};
 `
 

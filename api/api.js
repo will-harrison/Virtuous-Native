@@ -1,51 +1,75 @@
 import { SQLite } from 'expo'
-import uuid from 'uuid/v4'
 export const db = SQLite.openDatabase('db.virtuous')
 
-export const provisionDB = async () => {
-  console.log("Provisioning DB")
-  db.transaction(tx => {
-    // tx.executeSql(`insert into virtues (userId, virtueName, virtueDescription) values ('will', 'Order', 'Be orderly');`)
-    tx.executeSql(
-      'create table if not exists users (id integer primary key not null, userName text, password text);'
+export const provisionDB = async (forceDrop = false) => {
+  forceDrop && await dropTables()
+  const checkProvision = `select * from users limit 1;`
+  const dbExisits = await executeQuery(checkProvision).catch(err => {
+    console.log("Provisioning Database.")
+    Promise.all(
+      executeQuery(`create table if not exists users (id integer primary key not null, userName text , password text);`),
+      executeQuery(`create unique index users_userName on users (userName);`),
+      executeQuery(`create table if not exists virtues (id integer primary key not null, userId integer, virtueName text, virtueDescription text);`),
+      executeQuery(`create index virtues_userId on virtues (userId);`),
+      executeQuery(`create table if not exists virtueTracker (id integer primary key not null, virtueId integer, value integer);`),
+      executeQuery(`create index virtueTracker_userId on virtueTracker (virtueId);`),
     )
-    tx.executeSql(
-      'create table if not exists virtues (id integer primary key not null, userId integer, virtueName text, virtueDescription text);'
-    )
-    tx.executeSql(
-      'create table if not exists virtueTracker (id integer primary key not null, virtueId integer, value integer);'
-    )
-  })
+      .then(() => console.log('Provisioning complete.'))
+  }
+  )
 }
 
-export const login = async (userName, password) => {
+const dropTables = () => {
+  console.log('Dropping tables...')
+  Promise.all(
+    executeQuery(`drop table if exists users;`),
+    executeQuery(`drop table if exists virtues;`),
+    executeQuery(`drop table if exists virtueTracker;`)
+  )
+    .then(() => console.log('Tables droped.'))
+    .catch(err => console.log(err))
 }
 
-export const getVirtues = (userId) => {
-  const query = `select * from virtues;`
+export const login = (userName, password) => {
+  return true
+}
+
+const executeQuery = (query) => {
   return new Promise((resolve, reject) => {
     db.transaction(tx => {
-      tx.executeSql(
-        query, [], (_, { rows }) => {
-          return JSON.stringify(rows._array)
-        }
-      )
+      tx.executeSql(query, [], (_, { rows }) => {
+        resolve(rows._array)
+      }, (_, err) => reject(err))
     })
   })
 }
 
-export const addVirtue = (userId, virtueName, virtueDescription) => {
-  return new Promise((resolve, reject) => {
-    db.transaction(tx => {
-      tx.executeSql(
-        `insert into virtues (userId, virtueName, virtueDescription) values (${userId}, ${virtueName}, ${virtueDescription})`,
-        [],
-        resolve(getVirtues(userId))
-      )
-    })
-  })
+export const createUser = (userName, password) => {
+  const query = `insert into users (userName, password) values (${userName}, ${password});`
+  return executeQuery(query)
+    .catch(err => console.log(err))
+}
 
-  console.log("done")
+export const getVirtues = (userName) => {
+  const query = `
+    select 
+      v.* 
+    from 
+      virtues v;`
+  return executeQuery(query)
+    .catch(err => {
+      console.log('err', err)
+    })
+
+}
+
+export const addVirtue = async (userId, virtueName, virtueDescription) => {
+  const query = `insert into virtues (userId, virtueName, virtueDescription) values (${userId}, '${virtueName}', '${virtueDescription}')`
+  console.log(query)
+  await executeQuery(query)
+    .catch(err => console.log(err))
+  return getVirtues(userId)
+    .catch(err => console.log(err))
 }
 
 export const deleteVirtue = (userId, virtueId) => {

@@ -29,6 +29,10 @@ const LoginForm = ({ onLogin }) => {
   );
 };
 
+LoginForm.propTypes = {
+  onLogin: PropTypes.func
+}
+
 const ButtonsContainer = styled(Row)`
   padding-top: 5;
   justify-content: space-around;
