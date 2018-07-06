@@ -31,7 +31,8 @@ export const Txt = styled.Text`
   font-size: ${props => props.size || 20};
   color: ${props => props.color || colors(.9).white};
   text-align: center;
-  width: ${props => props.width || '100%'};
+  width: ${props => Dimensions.get('window').width * (props.width / 100 || 1)};
+  margin-vertical: ${props => props.vert || 0};
 `
 
 export const Input = styled.TextInput`
@@ -47,9 +48,7 @@ export const Input = styled.TextInput`
 
 export const ButtonText = styled(Txt)`
   font-size: 16;
-  padding-horizontal: 15;
   padding-vertical: 30;
-  width: ${Dimensions.get('window').width * 0.35};
 `
 
 const button = (props) => {

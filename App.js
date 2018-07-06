@@ -3,10 +3,11 @@ import { createStackNavigator } from "react-navigation"
 import { colors } from './theme'
 import LoginContext from './components/login/Login'
 import Home from './components/home/Home'
-import NewVirtue from './components/virtues/NewVirtue'
+import NewVirtueContext from './components/virtues/NewVirtue'
 import Virtue from './components/virtues/Virtue'
 
 import UserProvider from './api/userContext';
+import VirtueProvider from './api/virtueContext';
 
 
 const AppStackNavigator = createStackNavigator({
@@ -22,8 +23,8 @@ const AppStackNavigator = createStackNavigator({
       header: null
     }
   },
-  NewVirtue: {
-    screen: NewVirtue,
+  NewVirtueContext: {
+    screen: NewVirtueContext,
     navigationOptions: {
       title: 'tester',
       headerStyle: {
@@ -43,6 +44,8 @@ const AppStackNavigator = createStackNavigator({
 
 export default App = () => (
   <UserProvider>
-    <AppStackNavigator />
+    <VirtueProvider>
+      <AppStackNavigator />
+    </VirtueProvider>
   </UserProvider>
 )

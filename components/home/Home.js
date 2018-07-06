@@ -1,63 +1,47 @@
 import React from 'react'
 import { TouchableOpacity } from 'react-native'
+import { withNavigation } from 'react-navigation'
 import styled from 'styled-components'
 import { colors, Column, Theme, Txt, ButtonText } from '../../theme'
 import Virtue from '../virtues/Virtue'
-import { getVirtues } from '../../api/api'
 
 import { UserContext } from '../../api/userContext'
+import { VirtueContext } from '../../api/virtueContext'
 
-export default Home = () => {
+
+const Home = (props) => (
   <UserContext.Consumer>
-    {(context) => (
-      <HomeBoy {...context} />
-    )}
+    {user => (
+      <VirtueContext.Consumer>
+        {virtues => (
+          <HomeWithContext user={user} virtues={virtues} nav={props.navigation} />
+        )}
+      </VirtueContext.Consumer>
+    )
+    }
   </UserContext.Consumer>
-}
+)
 
-class HomeBoy extends React.Component {
-  state = {
-    virtues: []
-  }
-
-  componentDidMount = async () => {
-    console.log(this.props)
-    await this.setVirtues()
-  }
-
-  setVirtues = () => {
-    getVirtues()
-      .then(virtues => {
-        if (virtues.length > 0) {
-          this.setState(state => {
-            return {
-              ...state,
-              virtues
-            }
-          })
-        }
-      })
-      .catch(err => console.log(err))
+class HomeWithContext extends React.Component {
+  componentDidMount = () => {
+    this.props.virtues.getVirtues(this.props.user.user.userId)
   }
 
   render() {
-    const { virtues } = this.state
+    let virtues = this.props.virtues.virtues.virtues
     return (
-
       <Theme>
         <Container>
           {virtues.length
             ? <Virtue virtue={virtues[0]} />
-            : <Txt width={'75%'}>There are no virtues. Please add at least one virtue.</Txt>
+            : <Txt width={75}>There are no virtues. Please add at least one virtue.</Txt>
           }
-          <TouchableOpacity onPress={() => this.props.navigation.navigate('NewVirtue')}>
+          <TouchableOpacity onPress={() => { this.props.nav.navigate('NewVirtueContext') }}>
             <ButtonText>New Virtue</ButtonText>
           </TouchableOpacity>
         </Container>
       </Theme>
     )
-
-
   }
 }
 
@@ -67,3 +51,5 @@ const Container = styled(Column)`
   align-items: center;
 
 `
+
+export default withNavigation(Home)

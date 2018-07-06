@@ -1,29 +1,24 @@
 import React from 'react';
-import { Text, TouchableOpacity, View } from 'react-native'
+import { TouchableOpacity } from 'react-native'
 import styled from 'styled-components'
-import PropTypes from 'prop-types';
-import { Txt, Title, Row } from '../../theme/'
+import { Txt, Row } from '../../theme/'
 
-const BetterWorse = props => {
+const BetterWorse = (props) => {
   return (
     <Container>
-      <TouchableOpacity>
-        <ButtonText>Better</ButtonText>
+      <TouchableOpacity onPress={() => props.updateVirtueData(1)}>
+        <ButtonText width={30}>Better</ButtonText>
       </TouchableOpacity>
-      <TouchableOpacity>
-        <ButtonText>Worse</ButtonText>
+      <TouchableOpacity onPress={() => props.updateVirtueData(-1)}>
+        <ButtonText width={30}>Worse</ButtonText>
       </TouchableOpacity>
     </Container>
   );
 };
 
-BetterWorse.propTypes = {
-
-};
-
 const ButtonText = styled(Txt)`
-  padding-horizontal: 15;
 `
+// padding-horizontal: 15;
 
 const Container = styled(Row)`
   margin-top: 25;

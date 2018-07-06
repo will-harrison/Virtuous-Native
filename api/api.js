@@ -8,12 +8,14 @@ export const provisionDB = async (forceDrop = false) => {
     console.log("Provisioning Database.")
     Promise.all(
       executeQuery(`create table if not exists users (id integer primary key not null, userName text , password text);`),
-      executeQuery(`create unique index users_userName on users (userName);`),
       executeQuery(`create table if not exists virtues (id integer primary key not null, userId integer, virtueName text, virtueDescription text);`),
-      executeQuery(`create index virtues_userId on virtues (userId);`),
-      executeQuery(`create table if not exists virtueTracker (id integer primary key not null, virtueId integer, value integer);`),
-      executeQuery(`create index virtueTracker_userId on virtueTracker (virtueId);`),
+      executeQuery(`create table if not exists virtueTracker (id integer primary key not null, virtueId integer, timestamp datetime, value integer);`)
     )
+      .then(() => Promise.all(
+        executeQuery(`create unique index users_userName on users (userName);`),
+        executeQuery(`create index virtues_userId on virtues (userId);`),
+        executeQuery(`create index virtueTracker_userId on virtueTracker (virtueId);`),
+      ))
       .then(() => console.log('Provisioning complete.'))
   }
   )
@@ -31,6 +33,7 @@ const dropTables = () => {
 }
 
 export const login = (userName, password) => {
+  // TODO: update to use native login secure blah blah
   return true
 }
 
@@ -50,22 +53,22 @@ export const createUser = (userName, password) => {
     .catch(err => console.log(err))
 }
 
-export const getVirtues = (userName) => {
+export const getVirtues = (userId) => {
   const query = `
     select 
       v.* 
     from 
-      virtues v;`
+      virtues v
+    where 
+      v.userId = ${userId}`
   return executeQuery(query)
     .catch(err => {
       console.log('err', err)
     })
-
 }
 
 export const addVirtue = async (userId, virtueName, virtueDescription) => {
   const query = `insert into virtues (userId, virtueName, virtueDescription) values (${userId}, '${virtueName}', '${virtueDescription}')`
-  console.log(query)
   await executeQuery(query)
     .catch(err => console.log(err))
   return getVirtues(userId)
@@ -80,3 +83,39 @@ export const deleteVirtue = (userId, virtueId) => {
   })
 }
 
+export const getVirtueData = (virtueId, limit = 20, order = 'asc') => {
+  const query = `
+    select
+      timestamp,
+      value
+    from
+      virtueTracker
+    where
+      virtueId = ${virtueId}
+    order by
+      timestamp ${order}
+    limit ${limit}`
+  return executeQuery(query)
+    .catch(err => console.log(err))
+}
+
+export const addVirtueData = (virtueId, value) => {
+  const date = new Date()
+  const sqliteDate = date.toISOString()
+  const query = `
+    insert into
+      virtueTracker (
+        timestamp,
+        virtueId,
+        value
+    )
+    values (
+      '${sqliteDate}',
+      ${virtueId},
+      ${value}
+    )
+  `
+  console.log(query)
+  return executeQuery(query)
+    .catch(err => console.log(err))
+}

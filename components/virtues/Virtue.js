@@ -1,21 +1,33 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+import { withNavigation } from 'react-navigation'
 import styled from 'styled-components'
-import { Text, View } from 'react-native'
 import { Txt, Title, Column, Theme } from '../../theme/'
 import BetterWorse from './BetterWorse'
-import ChartTest from '../charts/ChartTest'
+import Chart from '../charts/Chart'
+import { VirtueContext } from '../../api/virtueContext'
 
-class Virtue extends React.Component {
+const Virtue = (props) => (
+  <VirtueContext.Consumer>
+    {virtues => <VirtueWithContext virtues={virtues} virtue={props.virtue} nav={props.navigation} />}
+  </VirtueContext.Consumer>
+)
+
+
+class VirtueWithContext extends React.Component {
+  componentDidMount = async () => {
+    console.log('VirtueWithContext: props', this.props)
+    const virtueData = await this.props.virtues.setVirtueData(this.props.virtue.id)
+    console.log('Virtue: virtueData', virtueData)
+  }
+
   render() {
-    const { virtue } = this.props
-    console.log('VIRTUE', virtue)
+    const { virtue, virtues } = this.props
     return (
       <VirtuesContainer>
         <Title>{virtue.virtueName}</Title>
         <Description width={'75%'} size={18}>{virtue.virtueDescription}</Description>
-        <BetterWorse />
-        <ChartTest />
+        <BetterWorse virtueId={virtue.id} updateVirtueData={(value) => virtues.updateVirtueData(value)} />
+        <Chart />
         <BackButton size={14}>Go Back</BackButton>
       </VirtuesContainer>
     );
@@ -33,7 +45,7 @@ const Description = styled(Txt)`
 `
 
 const BackButton = styled(Txt)`
-
+  margin-top: 50;
 `
 
-export default Virtue;
+export default withNavigation(Virtue);

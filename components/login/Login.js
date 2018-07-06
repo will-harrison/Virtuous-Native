@@ -2,54 +2,33 @@ import React from 'react';
 import styled from 'styled-components'
 import { Title, Column, Txt, Theme } from '../../theme/'
 import LoginForm from './LoginForm'
-import { provisionDB, login } from '../../api/api'
+import HomeContext from '../home/Home'
 
 import { UserContext } from '../../api/userContext'
 
 export default LoginContext = () => (
   <UserContext.Consumer>
-    {(context) => {
-      return (
-        <Login {...context} />
-      )
-    }}
+    {(user) => (
+      <Login {...user} />
+    )}
   </UserContext.Consumer>
 )
 
 class Login extends React.Component {
-
-  async componentDidMount() {
-    await provisionDB(this.props.dropTables)
-  }
-
-  onLogin = async (args) => {
-    await this.setState(state => {
-      return {
-        ...state,
-        authorized: true,
-        userName: args.userName
-      }
-    })
-    this.props.navigation.navigate('Home')
-  }
-
-
   render() {
-    console.log(this.props)
     return (
-      <UserContext.Consumer>
-        {(context) => (
-          !context.state.authorized && (
-            <Theme>
-              <LoginContainer>
-                <Title size={45}>Virtuous</Title>
-                <HelpText size={14}>Please login to Virtuous. If this is your first time using Virtuous, please create an account.</HelpText>
-                <LoginForm onLogin={this.onLogin} />
-              </LoginContainer>
-            </Theme>
-          )
-        )}
-      </UserContext.Consumer>
+      !this.props.user.authorized ? (
+        <Theme>
+          <LoginContainer>
+            <Title size={45}>Virtuous</Title>
+            <HelpText size={14}>Please login to Virtuous. If this is your first time using Virtuous, please create an account.</HelpText>
+            <LoginForm />
+          </LoginContainer>
+        </Theme>
+      )
+        : (
+          <HomeContext />
+        )
     )
   }
 }
