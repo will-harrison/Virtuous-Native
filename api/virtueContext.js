@@ -28,6 +28,9 @@ class VirtueProvider extends Component {
 
   setVirtueData = async (virtueId) => {
     const virtueData = await getVirtueData(virtueId)
+    virtueData.sort((a, b) => {
+      return b.timestamp - a.timestamp
+    })
     await this.setState(state => {
       return {
         virtueData
@@ -38,13 +41,7 @@ class VirtueProvider extends Component {
   updateVirtueData = async (virtueId, value) => {
     let lastValue = await this.getLastValue(virtueId)
     await addVirtueData(virtueId, lastValue + value)
-    await this.setState(state => {
-      return {
-        ...state,
-        virtueData: getVirtueData(virtueId)
-      }
-    })
-    setVirtueData(virtueId)
+    await this.setVirtueData(virtueId)
   }
 
   getLastValue = async (virtueId) => {

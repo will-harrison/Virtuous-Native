@@ -1,20 +1,12 @@
 import React from 'react'
 import { View } from 'react-native'
-import { VictoryLine, VictoryChart, VictoryTheme } from 'victory-native'
+import { VictoryLine } from 'victory-native'
 import styled from 'styled-components'
 import { Column, colors, Txt } from '../../theme/'
-import { VirtueContext } from '../../api/virtueContext';
 
-export default Chart = () => (
-  <VirtueContext.Consumer>
-    {virtues => <ChartWithContext data={() => virtues.setVirtueData(1)} />}
-  </VirtueContext.Consumer>
-)
-
-class ChartWithContext extends React.Component {
+class Chart extends React.Component {
   render() {
     let { data } = this.props
-    console.log(data)
     return (
       <ChartContainer>
         {data.length ?
@@ -24,6 +16,10 @@ class ChartWithContext extends React.Component {
             height={200}
             style={{
               data: { stroke: `${colors().white}` },
+            }}
+            animate={{
+              duration: 100,
+              onLoad: { duration: 500 }
             }} />
           :
           <View>
@@ -42,3 +38,5 @@ const ChartContainer = styled(Column)`
   background-color: ${colors(0).blue};
   margin-top: 25;
 `
+
+export default Chart

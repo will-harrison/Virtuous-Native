@@ -89,9 +89,16 @@ export const getVirtueData = (virtueId, limit = 20, order = 'asc') => {
       timestamp,
       value
     from
-      virtueTracker
-    where
-      virtueId = ${virtueId}
+      (select 
+        timestamp, 
+        value 
+      from 
+        VirtueTracker 
+      where
+        virtueId = ${virtueId}
+      order by 
+        timestamp desc
+      limit ${limit})
     order by
       timestamp ${order}
     limit ${limit}`
@@ -115,7 +122,6 @@ export const addVirtueData = (virtueId, value) => {
       ${value}
     )
   `
-  console.log(query)
   return executeQuery(query)
     .catch(err => console.log(err))
 }

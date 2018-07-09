@@ -6,30 +6,43 @@ import BetterWorse from './BetterWorse'
 import Chart from '../charts/Chart'
 import { VirtueContext } from '../../api/virtueContext'
 
-const Virtue = (props) => (
-  <VirtueContext.Consumer>
-    {virtues => <VirtueWithContext virtues={virtues} virtue={props.virtue} nav={props.navigation} />}
-  </VirtueContext.Consumer>
-)
+const Virtue = (props) => {
+  console.log(props)
+  return (
+    <VirtueContext.Consumer>
+      {virtues => <VirtueWithContext virtues={virtues} virtue={props.virtue || props.navigation.state.params.virtue} nav={props.navigation} />}
+    </VirtueContext.Consumer>
+  )
+}
 
 
 class VirtueWithContext extends React.Component {
   componentDidMount = async () => {
-    console.log('VirtueWithContext: props', this.props)
-    const virtueData = await this.props.virtues.setVirtueData(this.props.virtue.id)
-    console.log('Virtue: virtueData', virtueData)
+    await this.props.virtues.setVirtueData(this.props.virtue.id)
+  }
+
+  updateVirtueData = async (value) => {
+    let { virtues, virtue, nav } = this.props
+    await virtues.updateVirtueData(virtue.id, value)
+    let currentVirtue = virtues.virtues.virtues.findIndex(v => v.id === virtue.id)
+    if (currentVirtue <= virtues.virtues.virtues.length) {
+      console.log(virtues.virtues.virtues[currentVirtue + 1])
+      nav.push('Virtue', { virtue: virtues.virtues.virtues[currentVirtue + 1] })
+    }
   }
 
   render() {
     const { virtue, virtues } = this.props
     return (
-      <VirtuesContainer>
-        <Title>{virtue.virtueName}</Title>
-        <Description width={'75%'} size={18}>{virtue.virtueDescription}</Description>
-        <BetterWorse virtueId={virtue.id} updateVirtueData={(value) => virtues.updateVirtueData(value)} />
-        <Chart />
-        <BackButton size={14}>Go Back</BackButton>
-      </VirtuesContainer>
+      <Theme>
+        <VirtuesContainer>
+          <Title>{virtue.virtueName}</Title>
+          <Description width={'75%'} size={18}>{virtue.virtueDescription}</Description>
+          <BetterWorse virtueId={virtue.id} updateVirtueData={(value) => this.updateVirtueData(value)} />
+          <Chart data={virtues.virtues.virtueData} />
+          <BackButton size={14}>Go Back</BackButton>
+        </VirtuesContainer>
+      </Theme>
     );
   }
 };
